@@ -5,17 +5,16 @@ from openai import OpenAIError  # 确保从正确的位置导入异常类
 import time
 
 
-
-
 class ChatGPTSummaryWriter:
-    def __init__(self, api_key: str, text: str, summary_count: Optional[int] = None) -> None:
+    def __init__(self, api_key: str, text: str, base_url: Optional[str] = "https://api.chatanywhere.tech/v1",
+                 summary_count: Optional[int] = None, ) -> None:
         self.api_key = api_key
         self.text = text
         self.seg_length = 3400
         self.summary_count = 10 if summary_count is None else summary_count
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://api.chatanywhere.tech/v1"
+            base_url=base_url
         )
 
     def _seg_content(self):
@@ -23,7 +22,7 @@ class ChatGPTSummaryWriter:
         n = text_length // self.seg_length + 1
         print(f"本视频共计{text_length}字，将分成{n}个段落来总结")
         segment_text = [self.text[(self.seg_length * i): (self.seg_length * (i + 1)) if text_length > (
-                    self.seg_length * (i + 1) - 1) else text_length] for i in range(n)]
+                self.seg_length * (i + 1) - 1) else text_length] for i in range(n)]
         return segment_text
 
     def _request_chatGPT(self, prompt, text):
